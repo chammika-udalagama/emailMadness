@@ -70,5 +70,5 @@ There three ways you can run the programme.
 
 The logical flow of the programme is shown below.
 
-![](/Volumes/theChest/tools/e-mails/flow-chart.png)
+![](./flow-chart.png)
 

@@ -64,7 +64,7 @@ There three ways you can run the programme.
 |        OS         |       Filename       |  Size  | Link |     Where     |
 | :---------------: | :------------------: | :----: | :--: | :-----------: |
 | Mac OS Executable | `emailMadness_mac` | 264 Mb | [Download](http://sps.nus.edu.sg/tools/downloads/emailMadness_mac) |  SPS Server   |
-|    python file    | `emailMadness.py`  |   -    |      | This git site |
+|    python file    | `emailMadness.py`  |   -    | [Download](./emailMadness.py) | This git site |
 
 ### Flow
 

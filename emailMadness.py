@@ -4,6 +4,7 @@
 ## Written by Chammika Udalagama (chammika@nus.edu.sg)                       ## 
 ## ------------------------------------------------------------------------- ##
 ## Last updated: 2019-02-22: First version.                                  ##
+## Last updated: 2019-03-02: Added command line running option.              ##
 ##                                                                           ##
 ##                                                                           ##
 ###############################################################################
@@ -18,6 +19,7 @@ from email.mime.base import MIMEBase
 from pandas import read_excel
 from datetime import datetime
 from tkinter import filedialog, messagebox, Tk
+import sys
 
 global_count = 0
 
@@ -50,14 +52,15 @@ def sendMail(to,sender,mode='html',test = True):
     address = [to['Email']]
 
               
-    if to['Cc'] != 'NO':
+    if to['Cc'] != 'NO' and to['Cc'] != None:
         msg['CC'] =  to['Cc']
         address += [to['Cc']]
         print_message += '\tCc: {}\n'.format(to['Cc'])
         
-    if to['Bcc'] != 'NO':
+    if to['Bcc'] != 'NO' and to['Bcc'] != None:
         address += [to['Bcc']]
         print_message += '\tBcc: {}\n'.format(to['Bcc'])
+
 
     if to['File'] != None:
         filename = to['File'].split('/');
@@ -87,6 +90,7 @@ def sendMail(to,sender,mode='html',test = True):
     # If we are testing send back to the sender
     if test: 
         address = sender['Email']
+        msg['To'] = '---TEST--- {} <{}>'.format(str(to['Name']),str(to['Email']))
         
     server.sendmail(sender['Email'],address,msg.as_string())
     server.close()
@@ -101,6 +105,7 @@ def sendMail(to,sender,mode='html',test = True):
         file.write('*'*10+'TESTING'+'*'*10+'\n')
     else:
         file.write('-'*30 + '\n')
+        
     file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     file.write('\n'+ print_message)
     file.close()
@@ -144,7 +149,7 @@ def driver(info_file = 'email-info.xlsx', test = True):
         message['Mode'] = 'text'
     
     print('\tFinished reading Message info')
-    #print(message)     
+#    print(message)     
     
     #------------------------------------------------------------#
     #                                                            #
@@ -191,31 +196,48 @@ def driver(info_file = 'email-info.xlsx', test = True):
 
 
 if __name__=='__main__':
-    root = Tk()
-    root.withdraw()
-    #root.update()
-    filepath =  filedialog.askopenfilename(title = "Select file with E-mail Info",filetypes = (("Excel files","*.xlsx"),("all files","*.*")))
     
-    #------------------- Get path to Excel file -----------------#
-    if filepath:
-        answer = messagebox.askyesnocancel('Send Test E-mails?',"Do you want to send a few test e-mails")
-        print(answer)
+    if len(sys.argv) == 2:
+        print('Running emailMadness in command line mode\n')
         
-        #--------------- Do You Want To Test Your File --------------#
-        if answer == None: # Pressed 'Cancel' so quit
-            exit()
-        elif answer:   # Send test e-mails
+        filepath = sys.argv[1]
+        
+        # Ask for to test
+        rst = input('Do you want to send a few test e-mails? [Y/N]\t')
+        
+        if rst == 'y' or rst == 'Y':
             driver(info_file=filepath,test=True)
-            print('Send test e-mails')
         else:
-            answer = messagebox.askyesnocancel('Send All Mail for Real',"Shall I start sending all the e-mails?")
-            
-            #------------------- Send e-mails for real ------------------#
-            if answer:
+            rst = input('Shall I start sending all the e-mails? [Y/N]\t')
+            if rst == 'y' or rst == 'Y':
                 driver(info_file=filepath,test=False)
-            else:
-                exit()
                 
     else:
-        print('No Excel maifile selected. Exitting.')
+        root = Tk()
+        root.withdraw()
+        #root.update()
+        filepath =  filedialog.askopenfilename(title = "Select file with E-mail Info",filetypes = (("Excel files","*.xlsx"),("all files","*.*")))
+        
+        #------------------- Get path to Excel file -----------------#
+        if filepath:
+            answer = messagebox.askyesnocancel('Send Test E-mails?',"Do you want to send a few test e-mails")
+            print(answer)
+            
+            #--------------- Do You Want To Test Your File --------------#
+            if answer == None: # Pressed 'Cancel' so quit
+                exit()
+            elif answer:   # Send test e-mails
+                driver(info_file=filepath,test=True)
+                print('Send test e-mails')
+            else:
+                answer = messagebox.askyesnocancel('Send All Mail for Real',"Shall I start sending all the e-mails?")
+                
+                #------------------- Send e-mails for real ------------------#
+                if answer:
+                    driver(info_file=filepath,test=False)
+                else:
+                    exit()
+                    
+        else:
+            print('No Excel file selected. Exitting.')
         
